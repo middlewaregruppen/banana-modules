@@ -1,0 +1,11 @@
+dexBaseUrl: https://auth-dev.k8s.vgregion.se
+hostAliases:
+  - ip: "10.231.115.60"
+    hostnames:
+    - "auth-dev.k8s.vgregion.se"
+
+storage:
+  size: 1Gi
+  persistence:
+    enabled: true
+    type: "pvc"
