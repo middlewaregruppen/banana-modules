@@ -1,0 +1,4 @@
+hostAliases:
+  - ip: "10.231.115.59"
+    hostnames:
+    - "hubble-lab-dex.k8s.vgregion.se"
