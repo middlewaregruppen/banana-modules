@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+- grafana-dashboard-k8s-resources-workload.yaml
+- grafana-dashboard-k8s-resources-workloads-namespace.yaml
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: grafana
+    namespace: infra-monitoring
+  patch: |-
+    - op: add
+      path: /spec/template/spec/volumes/-
+      value:  
+        configMap:
+          name: grafana-dashboard-k8s-resources-workload
+        name: grafana-dashboard-k8s-resources-workload
+    - op: add
+      path: /spec/template/spec/volumes/-
+      value:  
+        configMap:
+          name: grafana-dashboard-k8s-resources-workloads-namespace
+        name: grafana-dashboard-k8s-resources-workloads-namespace
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: grafana
+    namespace: infra-monitoring
+  patch: |-
+    - op: add
+      path: /spec/template/spec/containers/0/volumeMounts/-
+      value:
+        readOnly: false
+        mountPath: /grafana-dashboard-definitions/0/k8s-resources-workload
+        name: grafana-dashboard-k8s-resources-workload
+    - op: add
+      path: /spec/template/spec/containers/0/volumeMounts/-
+      value:
+        readOnly: false
+        mountPath: /grafana-dashboard-definitions/0/k8s-resources-workloads-namespace
+        name: grafana-dashboard-k8s-resources-workloads-namespace
