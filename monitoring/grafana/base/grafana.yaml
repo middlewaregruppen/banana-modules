@@ -1,17 +1,4 @@
 ---
-# Source: inrastructure-grafana/templates/pvc.yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: grafana-pvc
-  namespace: infra-monitoring
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 # Source: inrastructure-grafana/templates/svc.yaml
 apiVersion: v1
 kind: Service
