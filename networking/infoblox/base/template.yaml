@@ -1,0 +1,253 @@
+---
+# Source: infoblox-dns-webhook/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: infoblox-infoblox-dns-webhook
+  labels:
+    helm.sh/chart: infoblox-dns-webhook-0.1.22
+    app.kubernetes.io/name: infoblox-dns-webhook
+    app.kubernetes.io/instance: infoblox
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: infoblox-dns-webhook/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: infoblox-server-credentials
+type: Opaque
+data:
+  INFOBLOX_NAME: aW5mb2Jsb3gtc2VydmVyLWNyZWRlbnRpYWxz
+  INFOBLOX_PASSWORD: eXl5eXl5
+  INFOBLOX_USERNAME: eHh4eHg=
+---
+# Source: infoblox-dns-webhook/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: infoblox-dns-webhook-tls
+type: tls
+data:
+  tls.crt: 
+  tls.key:
+---
+# Source: infoblox-dns-webhook/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: infoblox-server-info
+data:
+    LOADBALANCER_IP: "127.0.0.1"
+    INFOBLOX_PORT: "443"
+    INFOBLOX_PROTOCOL: "https"
+    INFOBLOX_SERVER: "infoblox.localdev.me"
+    INFOBLOX_VERSION: "v2.12.1"
+    INFOBLOX_VIEW: "default.localdev"
+    INFOBLOX_ZONE: "localdev.me"
+---
+# Source: infoblox-dns-webhook/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ingress-controller-svc-reader
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+---
+# Source: infoblox-dns-webhook/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: ingress-controller-svc-reader-rb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress-controller-svc-reader
+subjects:
+- kind: ServiceAccount
+  name: infoblox-infoblox-dns-webhook
+  namespace: actions-runner-system
+---
+# Source: infoblox-dns-webhook/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: infoblox-infoblox-dns-webhook
+  labels:
+    helm.sh/chart: infoblox-dns-webhook-0.1.22
+    app.kubernetes.io/name: infoblox-dns-webhook
+    app.kubernetes.io/instance: infoblox
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 443
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: infoblox-dns-webhook
+    app.kubernetes.io/instance: infoblox
+---
+# Source: infoblox-dns-webhook/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infoblox-infoblox-dns-webhook
+  labels:
+    helm.sh/chart: infoblox-dns-webhook-0.1.22
+    app.kubernetes.io/name: infoblox-dns-webhook
+    app.kubernetes.io/instance: infoblox
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: infoblox-dns-webhook
+      app.kubernetes.io/instance: infoblox
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: infoblox-dns-webhook
+        app.kubernetes.io/instance: infoblox
+    spec:
+      serviceAccountName: infoblox-infoblox-dns-webhook
+      securityContext:
+        {}
+      containers:
+        - name: infoblox-dns-webhook
+          securityContext:
+            {}
+          image: "ghcr.io/middlewaregruppen/infoblox-dns-webhook/infoblox-dns-webhook:sha-1136728"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8443
+              protocol: TCP
+          #livenessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: http
+          #readinessProbe:
+          #  httpGet:
+          #    path: /health
+          #    port: http
+          volumeMounts:
+          - name: infoblox-dns-webhook-tls
+            mountPath: /etc/certs
+          env:          
+          - name: INFOBLOX_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_PORT
+          - name: INFOBLOX_PROTOCOL
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_PROTOCOL
+          - name: INFOBLOX_SERVER
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_SERVER
+          - name: INFOBLOX_VERSION
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_VERSION
+          - name: INFOBLOX_VIEW
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_VIEW
+          - name: INFOBLOX_ZONE
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: INFOBLOX_ZONE
+          - name: LOADBALANCER_IP
+            valueFrom:
+              configMapKeyRef:
+                name: infoblox-server-info
+                key: LOADBALANCER_IP          
+          - name: INFOBLOX_NAME
+            valueFrom:
+              secretKeyRef:
+                name: infoblox-server-credentials
+                key: INFOBLOX_NAME
+          - name: INFOBLOX_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: infoblox-server-credentials
+                key: INFOBLOX_PASSWORD
+          - name: INFOBLOX_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: infoblox-server-credentials
+                key: INFOBLOX_USERNAME
+          resources:
+            {}
+      volumes:
+      - name: infoblox-dns-webhook-tls
+        secret:
+          secretName: infoblox-dns-webhook-tls
+---
+# Source: infoblox-dns-webhook/templates/infoblox-admission-webhook.yaml
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: infoblox-dns-webhook-ingress-mutation
+webhooks:
+  - name: infoblox-dns-webhook.mutation.actions-runner-system.svc
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: [ "kube-system", "actions-runner-system" ]
+    rules:
+      - operations: [ "CREATE", "UPDATE", "DELETE" ]
+        apiGroups: [ "networking.k8s.io" ]
+        apiVersions: [ "v1" ]
+        resources: [ "ingresses" ]
+        scope: "Namespaced"
+    clientConfig:
+      caBundle: 
+      service:
+        namespace: actions-runner-system
+        name: infoblox-dns-webhook
+        path: "/mutate"
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 30
+---
+# Source: infoblox-dns-webhook/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "infoblox-infoblox-dns-webhook-test-connection"
+  labels:
+    helm.sh/chart: infoblox-dns-webhook-0.1.22
+    app.kubernetes.io/name: infoblox-dns-webhook
+    app.kubernetes.io/instance: infoblox
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['infoblox-infoblox-dns-webhook:443']
+  restartPolicy: Never
