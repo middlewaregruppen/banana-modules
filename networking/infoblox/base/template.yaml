@@ -18,9 +18,9 @@ metadata:
   name: infoblox-server-credentials
 type: Opaque
 data:
-  INFOBLOX_NAME: aW5mb2Jsb3gtc2VydmVyLWNyZWRlbnRpYWxz
-  INFOBLOX_PASSWORD: eXl5eXl5
-  INFOBLOX_USERNAME: eHh4eHg=
+  INFOBLOX_NAME:
+  INFOBLOX_PASSWORD:
+  INFOBLOX_USERNAME:
 ---
 # Source: infoblox-dns-webhook/templates/secret.yaml
 apiVersion: v1
