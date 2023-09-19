@@ -19,8 +19,8 @@ metadata:
 type: Opaque
 data:
   INFOBLOX_NAME: ""
-  INFOBLOX_PASSWORD: "changeme"
-  INFOBLOX_USERNAME: "changeme"
+  INFOBLOX_PASSWORD: ""
+  INFOBLOX_USERNAME: ""
 ---
 # Source: infoblox-dns-webhook/templates/secret.yaml
 apiVersion: v1
