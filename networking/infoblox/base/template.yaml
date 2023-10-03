@@ -29,8 +29,8 @@ metadata:
   name: infoblox-dns-webhook-tls
 type: tls
 data:
-  tls.crt: 
-  tls.key:
+  tls.crt: ""
+  tls.key: ""
 ---
 # Source: infoblox-dns-webhook/templates/configmap.yaml
 apiVersion: v1
