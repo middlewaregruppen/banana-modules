@@ -1,17 +1,12 @@
 ---
-# Source: infoblox-dns-webhook/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: infoblox-infoblox-dns-webhook
   labels:
-    helm.sh/chart: infoblox-dns-webhook-0.1.22
     app.kubernetes.io/name: infoblox-dns-webhook
     app.kubernetes.io/instance: infoblox
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
 ---
-# Source: infoblox-dns-webhook/templates/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -22,7 +17,6 @@ data:
   INFOBLOX_PASSWORD: ""
   INFOBLOX_USERNAME: ""
 ---
-# Source: infoblox-dns-webhook/templates/secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -32,7 +26,6 @@ data:
   tls.crt: ""
   tls.key: ""
 ---
-# Source: infoblox-dns-webhook/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -46,7 +39,6 @@ data:
     INFOBLOX_VIEW: "default.localdev"
     INFOBLOX_ZONE: "localdev.me"
 ---
-# Source: infoblox-dns-webhook/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -61,7 +53,6 @@ rules:
   - get
   - list
 ---
-# Source: infoblox-dns-webhook/templates/clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -76,17 +67,13 @@ subjects:
   name: infoblox-infoblox-dns-webhook
   namespace: actions-runner-system
 ---
-# Source: infoblox-dns-webhook/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: infoblox-infoblox-dns-webhook
   labels:
-    helm.sh/chart: infoblox-dns-webhook-0.1.22
     app.kubernetes.io/name: infoblox-dns-webhook
     app.kubernetes.io/instance: infoblox
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
 spec:
   type: ClusterIP
   ports:
@@ -98,17 +85,13 @@ spec:
     app.kubernetes.io/name: infoblox-dns-webhook
     app.kubernetes.io/instance: infoblox
 ---
-# Source: infoblox-dns-webhook/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: infoblox-infoblox-dns-webhook
   labels:
-    helm.sh/chart: infoblox-dns-webhook-0.1.22
     app.kubernetes.io/name: infoblox-dns-webhook
     app.kubernetes.io/instance: infoblox
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
@@ -203,7 +186,6 @@ spec:
         secret:
           secretName: infoblox-dns-webhook-tls
 ---
-# Source: infoblox-dns-webhook/templates/infoblox-admission-webhook.yaml
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -231,17 +213,13 @@ webhooks:
     sideEffects: None
     timeoutSeconds: 30
 ---
-# Source: infoblox-dns-webhook/templates/tests/test-connection.yaml
 apiVersion: v1
 kind: Pod
 metadata:
   name: "infoblox-infoblox-dns-webhook-test-connection"
   labels:
-    helm.sh/chart: infoblox-dns-webhook-0.1.22
     app.kubernetes.io/name: infoblox-dns-webhook
     app.kubernetes.io/instance: infoblox
-    app.kubernetes.io/version: "0.1.0"
-    app.kubernetes.io/managed-by: Helm
   annotations:
     "helm.sh/hook": test
 spec:
