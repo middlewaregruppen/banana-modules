@@ -5,7 +5,7 @@ patches:
     group: ""
     version: v1
     kind: Service
-    name: ingress-nginx
+    name: ingress-nginx-controller
     namespace: ingress-nginx
   patch: |-
     - op: replace
